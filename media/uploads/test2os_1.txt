@@ -1,0 +1,23 @@
+Threads is not shared among which of the following
+stack
+program counter
+both program counter and stack
+none
+
+Thread is a 
+Light weight process
+Heavy weight process
+Multi-process
+I/O process
+
+The two types of semaphores are
+Counting and decimal semaphore
+Counting and binary semaphore
+Counting and mutex
+None
+
+When can the binding of instructions and data to memory addresses be done?
+Load time
+Compile time
+Execution time
+All of the above

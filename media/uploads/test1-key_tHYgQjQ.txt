@@ -1,0 +1,4 @@
+Cascading Style Sheets
+<link  rel="stylesheet" type="text/css" href="mystyle.css">
+In the <head> section
+style

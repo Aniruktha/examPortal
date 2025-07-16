@@ -1,0 +1,92 @@
+<html>
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Review</title>
+        <link rel="stylesheet" href="{% static 'testStyles.css' %}">
+        <style>
+            .correct {
+                border: 2px solid green;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            .incorrect {
+                border: 2px solid red;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            .correct-answer {
+                color: green;
+                font-weight: bold;
+            }
+            .incorrect-answer {
+                color: red;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="sidebar">
+                <ul id="question-list">
+                    <h2>Questions</h2>
+                    {% for question in questions_review %}
+                        <li>
+                            <a href="javascript:void(0);" onclick="scrollToQuestion('question{{ forloop.counter }}')" tabindex="0">
+                                {{ forloop.counter }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="content">
+                {% if questions_review %}
+                    <h2>Test Review</h2>
+                    <form>
+                        {% csrf_token %}
+                        {% for question in questions_review %}
+                        <div id="question{{ forloop.counter }}" 
+                        class="question {% if question.selected_answer == question.correct_answer %}correct{% else %}incorrect{% endif %}">
+                       <p><strong>{{ question.question }}</strong></p>
+                       <ul>
+                           {% for option in question.options %}
+                               <li class="{% if option == question.correct_answer %}correct-answer{% elif option == question.selected_answer and option != question.correct_answer %}incorrect-answer{% endif %}">
+                                   {{ option }}
+                               </li>
+                           {% endfor %}
+                       </ul>
+                       <p>Correct Answer: <strong class="correct-answer">{{ question.correct_answer }}</strong></p>
+                       <p>Your Answer: 
+                           <strong class="{% if question.selected_answer == question.correct_answer %}correct-answer{% elif question.selected_answer %}incorrect-answer{% endif %}">
+                               {{ question.selected_answer|default:"Not Answered" }}
+                           </strong>
+                       </p>
+                   </div>                   
+                        {% endfor %}
+                        <a href="{% url 'courses_test' test.courseCode %}?score={{ test_record.score }}" class="btn btn-primary">
+                            Finish Review
+                        </a>
+                    </form>
+                {% else %}
+                    <p>No questions available.</p>
+                {% endif %}
+            </div>
+        </div>
+            </body>
+
+    <script>
+        function scrollToQuestion(questionId) {
+            const questionElement = document.getElementById(questionId);
+            if (questionElement) {
+                window.scrollTo({
+                    top: questionElement.offsetTop - 10, // Adjust offset if needed
+                    behavior: 'smooth' // Smooth scrolling effect
+                });
+            }
+        }
+    </script>
+</html>

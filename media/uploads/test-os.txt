@@ -1,0 +1,23 @@
+What is an operating system?
+interface between the hardware and application programs
+collection of programs that manages hardware resources
+system service provider to the application programs
+all of the mentioned
+
+What is the main function of the command interpreter?
+to provide the interface between the API and application program
+to handle the files in the operating system
+to get and execute the next user-specified command
+none of the mentioned
+
+In Operating Systems, which of the following is/are CPU scheduling algorithms?
+Priority
+Round Robin
+Shortest Job First
+All of the mentioned
+
+To access the services of the operating system, the interface is provided by the ___________
+Library
+System calls
+Assembly instructions
+API

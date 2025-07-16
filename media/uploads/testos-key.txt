@@ -1,0 +1,4 @@
+all of the mentioned
+to get and execute the next user-specified command
+all of the mentioned
+System calls

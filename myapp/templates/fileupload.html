@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Exam Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #f0f4f8;
+    }
+
+    /* Centering Container */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 0;
+    }
+
+    /* Form Container */
+    .form-container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      border: 2px solid #0c233f;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 700px; /* Increased Width */
+    }
+
+    h1 {
+      text-align: center;
+      color: #0c233f;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #0c233f;
+    }
+
+    /* Input fields */
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 2px solid #0c233f;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+    }
+
+    /* Submit Button */
+    button {
+      background-color: #0c233f;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #071b35;
+    }
+
+    /* Notification Box */
+    .notification {
+      background-color: #89c2d9;
+      color: #0c233f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 5px solid #0c233f;
+    }
+
+    .notification strong {
+      color: #0c233f;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #0c233f;
+      color: white;
+      padding: 20px 10px;
+      text-align: center;
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+
+    .footer-content div {
+      max-width: 250px;
+    }
+
+    .footer a {
+      color: #89c2d9;
+      text-decoration: none;
+      display: block;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Form Container -->
+  <div class="container">
+    <div class="form-container">
+      <h1>Upload Exam Details</h1>
+     
+      <!-- Notification -->
+      <div class="notification">
+        <strong>Note:</strong> Ensure the question and answer files are in PDF or DOCX format. The username should match your official login ID.
+      </div>
+
+      <form method="post" enctype="multipart/form-data" id="examForm">
+        {% csrf_token %}
+       
+        <label for="name">Test Name:</label> 
+        <input type="text" name="name" placeholder="Enter test name" required />
+       
+        <label for="Qfiles">Select Question File:</label>
+        <input type="file" name="Qfiles" required />
+       
+        <label for="Afiles">Select Answer File:</label>
+        <input type="file" name="Afiles" required />
+       
+        <label for="startTime">Start Date and Time:</label>
+        <input type="datetime-local" name="startTime" id="startTime" required />
+       
+        <label for="endTime">Stop Date and Time:</label>
+        <input type="datetime-local" name="endTime" id="endTime" required />
+       
+        <label for="courseCode">Course Code:</label>
+        <input type="text" name="courseCode" placeholder="Enter course code" required />
+       
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <strong>Contact Us</strong><br />
+        Email: support@examportal.com <br />
+        Phone: +123 456 7890
+      </div>
+
+      <div>
+        <strong>Quick Links</strong><br />
+        <a href="#">Home</a>
+        <a href="#">About Us</a>
+        <a href="#">Support</a>
+      </div>
+
+      <div>
+        <strong>Follow Us</strong><br />
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+    <p>© 2025 Exam Portal. All Rights Reserved.</p>
+  </footer>
+
+  <!-- JavaScript for Validation -->
+  <script>
+    document.getElementById("examForm").addEventListener("submit", function (event) {
+      let startTime = document.getElementById('startTime').value;
+      let endTime = document.getElementById('endTime').value;
+
+      // Convert to Date objects
+      let startDate = new Date(startTime);
+      let endDate = new Date(endTime);
+
+      if (startDate >= endDate) {
+        alert("Error: Start Date and Time must be earlier than Stop Date and Time.");
+        event.preventDefault(); // Prevent form submission
+      }
+    });
+  </script>
+</body>
+</html>

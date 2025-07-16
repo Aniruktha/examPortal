@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Turbulate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Base Styling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f4f8; /* Light pastel shade */
+      color: #1e293b;
+      overflow-y: auto;
+      min-height: 150vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3.8rem;
+      font-weight: 400;
+      margin-top: 60px;
+      color: #34495e;
+    }
+
+    /* About Us Container */
+    .about-container {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-top: 30px;
+      padding: 40px;
+      flex-wrap: wrap;
+      flex-grow: 1;
+      margin-bottom:50px;
+    }
+
+    /* Developer Card */
+    .developer-card {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      width: 350px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      height: 470px;
+    }
+
+    .developer-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .developer-img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #89c2d9;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #5a9fbf;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #34495e;
+    }
+
+    /* Footer Section */
+    footer {
+      background-color: #34495e; /* Darker shade */
+      color: #ffffff; /* White text for contrast */
+      text-align: center;
+      padding: 20px;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 16px;
+      color: #ffffff; /* Ensure white color for copyright text */
+    }
+
+    footer a {
+      color: #89c2d9; /* Light blue for links */
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      color: #ffffff; /* White on hover */
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 3rem;
+      }
+      .developer-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- About Us Section -->
+  <h1>Meet Our Developers</h1>
+  
+  <div class="about-container">
+    <!-- Developer 1 -->
+    <div class="developer-card">
+      <img src="{% static 'naruto.png' %}" alt="Developer 1" class="developer-img">
+      <h2>Naruto Uzumaki</h2>
+      <p>Naruto is a passionate full-stack developer with expertise in building responsive web applications. He loves coding, solving complex problems, and participating in hackathons.</p>
+    </div>
+
+    <!-- Developer 2 -->
+    <div class="developer-card">
+      <img src="{% static 'lunalovegood.png' %}" alt="Developer 2" class="developer-img">
+      <h2>Luna Lovegood</h2>
+      <p>Luna is a software engineer specializing in UI/UX design. With a keen eye for detail, she ensures seamless user experiences and creates beautiful web interfaces.</p>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>&copy; 2025 Turbulate. All Rights Reserved. | 
+    <a href="#">Privacy Policy</a> | 
+    <a href="#">Contact Us</a>
+    </p>
+  </footer>
+
+</body>
+</html>

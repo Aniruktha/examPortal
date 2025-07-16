@@ -1,0 +1,4 @@
+both program counter and stack
+Light weight process
+Counting and binary semaphore
+All of the above

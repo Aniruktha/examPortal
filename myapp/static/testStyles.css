@@ -1,0 +1,84 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+}
+
+
+.sidebar {
+    width: 200px;
+    background: #0C243C;
+    color: #fff;
+    padding: 15px;
+    position: fixed; /* Keeps it in place */
+    height: 100vh; /* Full height */
+    left: 0;
+    top: 0;
+    overflow-y: auto; /* Scroll if necessary */
+}
+
+.sidebar h2 {
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 10px 0;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+    display: block;
+    transition: background 0.3s;
+border: 2px
+}
+
+.sidebar ul li a:hover {
+    background: #575757;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    margin-left: 220px; /* Push content to the right so it doesn't overlap */
+    width: calc(100% - 220px);
+    box-sizing: border-box;
+}
+
+.question {
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.question.doubt {
+    border: 2px solid red;
+}
+
+button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 30px;
+
+}
+
+button:hover {
+    background-color: #0056b3;
+}

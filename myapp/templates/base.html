@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <!--<style>
+    /* Base Styling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .container, .login-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.6s ease;
+    }
+
+    /* Selection Screen */
+    .selection-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 5rem;
+      font-weight: 600;
+      transition: transform 0.5s ease;
+    }
+
+    .student {
+      background-color: #071b35;
+      color: white;
+    }
+
+    .teacher {
+      background-color: #89c2d9;
+      color: #071b35;
+    }
+
+    .selection-box:hover {
+      transform: scale(1.05);
+    }
+
+    /* Login Section */
+    .login-container {
+      transform: translateX(100%);
+      z-index: 1;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .role-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 5rem;
+      font-weight: bold;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-section h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    input {
+      width: 80%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid gray;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 85%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    .back-button {
+      background-color: gray;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #555;
+    }
+
+    /* Student Styles */
+    .student-form {
+      background-color: #89c2d9;
+      color: #071b35;
+    }
+
+    .student-form input {
+      background-color: white;
+      border: 1px solid #5a9fbf;
+      color: #071b35;
+    }
+
+    .student-form button {
+      background-color: #071b35;
+      color: white;
+    }
+
+    /* Teacher Styles */
+    .teacher-form {
+      background-color: #071b35;
+      color: white;
+    }
+
+    .teacher-form input {
+      background-color: #e6f2ff;
+      border: 1px solid #5a9fbf;
+      color: #071b35;
+    }
+
+    .teacher-form button {
+      background-color: #89c2d9;
+      color: #071b35;
+    }
+  </style> -->
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    .container, .login-container {
+      width: 50vw;
+      height: 50vh;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.6s ease;
+    }
+    .selection-box {
+      flex: 1;
+      display: flex;
+      position: center;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 5rem;
+      font-weight: 600;
+      transition: transform 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Role Selection Screen -->
+  <div class="container" id="roleSelection">
+    <div class="selection-box student" onclick="showLogin('student')">STUDENT</div>
+    <div class="selection-box teacher" onclick="showLogin('teacher')">TEACHER</div>
+  </div>
+
+  <!-- Login Screen -->
+  <div class="login-container" id="loginContainer">
+    <div class="role-section" id="roleSection"></div>
+    <div class="form-section" id="formSection">
+      <h2 id="welcomeText">Welcome!</h2>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <button type="button" class="back-button" onclick="goBack()">Back</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showLogin(role) {
+      const loginContainer = document.getElementById('loginContainer');
+      const roleSelection = document.getElementById('roleSelection');
+      const roleSection = document.getElementById('roleSection');
+      const welcomeText = document.getElementById('welcomeText');
+      const formSection = document.getElementById('formSection');
+
+      // Slide effect
+      roleSelection.style.transform = 'translateX(-100%)';
+      loginContainer.style.transform = 'translateX(0)';
+
+      // Role-based Customization
+      if (role === 'student') {
+        roleSection.textContent = 'Student';
+        roleSection.style.backgroundColor = '#071b35';
+        roleSection.style.color = '#ffffff';
+        welcomeText.textContent = 'Welcome, Student!';
+        formSection.className = 'form-section student-form';
+      } else {
+        roleSection.textContent = 'Teacher';
+        roleSection.style.backgroundColor = '#89c2d9';
+        roleSection.style.color = '#071b35';
+        welcomeText.textContent = 'Welcome, Teacher!';
+        formSection.className = 'form-section teacher-form';
+      }
+    }
+
+    function goBack() {
+      document.getElementById('roleSelection').style.transform = 'translateX(0)';
+      document.getElementById('loginContainer').style.transform = 'translateX(100%)';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<html>
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Quiz</title>
+    <link rel="stylesheet" href="{% static 'testStyles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Time Remaining: <span id="timer"></span></h2>
+            <ul id="question-list">
+                <h2>Questions</h2>
+                {% for question in questions %}
+                    <li>
+                        <a href="javascript:void(0);" onclick="scrollToQuestion('question{{ forloop.counter }}')">
+                            {{ forloop.counter }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="content">
+            {% if questions %}
+            <form id="testForm" method="post" action="{% url 'Taketest' fileName|cut:'uploads/' %}">
+                {% csrf_token %}
+                {% for question in questions %}
+                    <div id="question{{ forloop.counter }}" class="question" data-question-number="{{ forloop.counter }}">
+                        <p><strong>{{ question.question }}</strong></p>
+                        {% for option in question.options %}
+                            <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ option }}"> {{ option }}<br>
+                        {% endfor %}
+                    </div>
+                    <button type="button" onclick="markDoubt('question{{ forloop.counter }}')">Mark as Doubt</button><br>
+                {% endfor %}
+                <button type="submit">Submit</button>
+            </form>
+            {% else %}
+                <p>No questions available!</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+<script>
+    let testEndTime = new Date("{{ test.endTime|date:'c' }}").getTime();
+
+function updateTimer() {
+    let now = new Date().getTime();
+    let timeLeft = testEndTime - now;
+
+    if (timeLeft <= 0) {
+        document.getElementById("timer").innerHTML = "Time's up!";
+        //autoSubmit();
+        return;
+    }
+
+    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    document.getElementById("timer").innerHTML = minutes + "m " + seconds + "s ";
+    setTimeout(updateTimer, 1000);
+}
+
+/*function autoSubmit() {
+    let form = document.getElementById("testForm");
+    
+    // Fill in unanswered questions as "Not Answered"
+    document.querySelectorAll("input[type='radio']").forEach(radio => {
+        if (!radio.checked) {
+            let name = radio.name;
+            if (!document.querySelector(`input[name="${name}"]:checked`)) {
+                let hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = name;
+                hiddenInput.value = "Not Answered";  // Store unanswered as "Not Answered"
+                form.appendChild(hiddenInput);
+            }
+        }
+    });
+
+    form.submit();
+}*/
+    window.onload = updateTimer; 
+
+    function markDoubt(questionId) {
+        document.getElementById(questionId).classList.toggle('doubt');
+    }
+
+    function scrollToQuestion(questionId) {
+        const questionElement = document.getElementById(questionId);
+        if (questionElement) {
+            window.scrollTo({
+                top: questionElement.offsetTop - 10,
+                behavior: 'smooth'
+            });
+        }
+    }
+    
+</script>
+</html>

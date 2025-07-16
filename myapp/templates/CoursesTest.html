@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Tests</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #071b35;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 2.8rem;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .test-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .test-info h3 {
+            margin: 0;
+            font-size: 1.7rem;
+            color: #071b35;
+        }
+
+        .test-info p {
+            margin: 8px 0;
+            color: #7a7a7a;
+        }
+
+        button, .review-btn, .attempt-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .attempt-btn.active {
+            background-color: #5cb85c;
+        }
+
+        .attempt-btn.active:hover {
+            background-color: #4cae4c;
+        }
+
+        .attempt-btn.inactive {
+            background-color: #a5a5a5;
+            cursor: not-allowed;
+        }
+
+        .review-btn {
+            background-color: #3498db;
+        }
+
+        .review-btn:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .test-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            button, .review-btn, .attempt-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+        .back-btn {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background-color: #e74c3c;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .back-btn:hover {
+            background-color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Course Tests</h1>
+
+    <div class="test-container" id="test-container">
+        {% for test in tests %}
+        <div class="test-card">
+            <div class="test-info">
+                <h3>{{ test.name }}</h3>
+                {% if test.taken %}
+                    <p>Score: {{ test.score }}</p>
+                {% else %}
+                    <p>Scheduled for: {{ test.startTime|date:"Y-m-d H:i" }}</p>
+                {% endif %}
+            </div>
+
+            {% if test.taken %}
+            <a href="{% url 'review_test' test.id %}" class="review-btn">Review ✅</a>
+            {% elif test.is_active %}
+                <a href="{% url 'Taketest' test.Qfiles.name|cut:'uploads/' %}" 
+                    id="attemptTestButton_{{ test.id }}" 
+                    class="attempt-btn inactive" 
+                    data-qfiles="{{ test.Qfiles }}" 
+                    data-start="{{ test.startTime|date:'c' }}" 
+                    data-end="{{ test.endTime|date:'c' }}" 
+                    style="pointer-events: none;">
+                    Attempt Now
+                </a>
+            {% else %}
+                <button class="attempt-btn inactive" disabled>Attempt Now</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".attempt-btn").forEach(button => {
+            const startTimeStr = button.getAttribute("data-start");
+            const endTimeStr = button.getAttribute("data-end");
+            let Qfiles = button.getAttribute("data-qfiles");
+
+            if (!startTimeStr || !endTimeStr || !Qfiles) {
+                console.warn("Missing test attributes for:", button);
+                return;  // Skip this button if any data is missing
+            }
+
+            const startTime = new Date(startTimeStr);
+            const endTime = new Date(endTimeStr);
+            const currentTime = new Date();
+
+            console.log("Test Start:", startTime, "Test End:", endTime, "Current Time:", currentTime);
+
+            // Remove "uploads/" if present
+            if (Qfiles.startsWith("uploads/")) {
+                Qfiles = Qfiles.replace("uploads/", "");
+            }
+
+            if (currentTime >= startTime && currentTime <= endTime) {
+                console.log("Test is active, enabling button...");
+                button.classList.remove("inactive");
+                button.classList.add("active");
+                button.style.pointerEvents = "auto";  // Enable click
+                button.href = `/test/${Qfiles}`;
+            }  else {
+            console.log("Test is inactive, disabling attempt button.");
+            button.classList.add("inactive");
+            button.style.pointerEvents = "none";  // Disable click
+
+            // Enable the "Review" button
+            const testCard = button.closest(".test-card");
+            if (testCard) {
+                const reviewBtn = testCard.querySelector(".review-btn");
+                if (reviewBtn) {
+                    reviewBtn.style.display = "inline-block"; // Show review button
+                }
+            }
+        }
+        });
+    });
+</script>
+<a href="{% url 'home' %}" class="back-btn">⬅ Back to Home</a>
+</body>
+</html>
