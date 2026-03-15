@@ -37,10 +37,10 @@ ALLOWED_HOSTS = [
     "*",
 ]
 
+RAILWAY_URL = os.environ.get('RAILWAY_APP_URL', 'http://127.0.0.1:8000')
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://astonishing-learning-production-3310.up.railway.app",
-    "https://examportal-production-be3c.up.railway.app/",
-    "https://examportal-moodlev2.up.railway.app/",
+    RAILWAY_URL,
 ]
 # Application definition
 
