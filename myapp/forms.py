@@ -1,6 +1,7 @@
 from django import forms
 import re
-from .models import Testfiles,Login
+from .models import Testfiles, Login
+from django.contrib.auth.hashers import make_password, check_password
 
 
 class Loginform(forms.Form):
@@ -9,7 +10,7 @@ class Loginform(forms.Form):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        pattern = r'^\d{2}(pw|pt|pd|pc)\d{2}$'  # Pattern check for username format
+        pattern = r'^\d{2}(pw|pt|pd|pc)\d{2}$'
         if not re.match(pattern, name):
             raise forms.ValidationError("Invalid Username Format!")
         return name
@@ -20,8 +21,8 @@ class Loginform(forms.Form):
         password = cleaned_data.get("password")
 
         if name and password:
-            # Check if the user exists in the database
-            if not Login.objects.filter(name=name, password=password).exists():
+            user = Login.objects.filter(name=name).first()
+            if not user or not check_password(password, user.password):
                 raise forms.ValidationError("Invalid username or password!")
 
         return cleaned_data
@@ -96,7 +97,8 @@ class StudentLoginForm(forms.Form):
         password = cleaned_data.get("password")
 
         if username and password:
-            if not Login.objects.filter(name=username, password=password).exists():
+            user = Login.objects.filter(name=username).first()
+            if not user or not check_password(password, user.password):
                 raise forms.ValidationError("Invalid username or password!")
 
         return cleaned_data
@@ -113,7 +115,8 @@ class TeacherLoginForm(forms.Form):
 
         if username and password:
             from .models import TeacherLogin
-            if not TeacherLogin.objects.filter(name=username, password=password).exists():
+            user = TeacherLogin.objects.filter(name=username).first()
+            if not user or not check_password(password, user.password):
                 raise forms.ValidationError("Invalid username or password!")
 
         return cleaned_data

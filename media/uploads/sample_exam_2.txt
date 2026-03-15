@@ -1,0 +1,25 @@
+When you clone a repo, what do you get?
+Only uncommitted changes
+Latest committed and pushed version
+Only CSS files
+Only database files
+What does git add . do?
+Deletes all files
+Stages changed files for commit
+Pushes files to GitHub
+Creates a new repo
+Which command shows commit history?
+git reset
+git log --oneline
+git checkout
+git fetch
+In Django, a 404 error means:
+Server started successfully
+Page not found
+Database connected
+User logged in
+What does %22 in a URL usually mean?
+Slash
+Space
+Double quote
+Dot

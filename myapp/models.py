@@ -9,7 +9,7 @@ IST = pytz.timezone("Asia/Kolkata")
 # Create your models here.
 class Login(models.Model):
     name=models.CharField(max_length=50, null=False)
-    password=models.CharField(max_length=50, null=False)
+    password=models.CharField(max_length=128, null=False)  # Increased for hashed passwords
     mail=models.EmailField(default=None)
     course=models.CharField(max_length=50, null=False, blank=False, default=None)
 
@@ -35,7 +35,7 @@ class Login(models.Model):
 
 class TeacherLogin(models.Model):
     name=models.CharField(max_length=50, null=False)
-    password=models.CharField(max_length=50, null=False)
+    password=models.CharField(max_length=128, null=False)  # Increased for hashed passwords
 
     class Meta:
         db_table="teacherLogin"

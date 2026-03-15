@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils.timezone import now, make_aware
 import pytz
@@ -37,9 +38,8 @@ def student_login(request):
         form = StudentLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
-            password = form.cleaned_data["password"]
-
-            user = Login.objects.filter(name=username, password=password).first()
+            # Password already validated by form's clean() method using check_password
+            user = Login.objects.filter(name=username).first()
 
             if user:
                 request.session['username'] = user.name  
@@ -60,9 +60,8 @@ def teacher_login(request):
         form = TeacherLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
-            password = form.cleaned_data["password"]
-
-            user = TeacherLogin.objects.filter(name=username, password=password).first()
+            # Password already validated by form's clean() method using check_password
+            user = TeacherLogin.objects.filter(name=username).first()
 
             if user:
                 request.session['username'] = user.name  
@@ -95,10 +94,10 @@ def student_register(request):
             }
             course = course_map.get(course_key, "Unknown Course")
 
-            # Create new student
+            # Create new student with hashed password
             student = Login.objects.create(
                 name=username,
-                password=password,
+                password=make_password(password),  # Hash the password!
                 mail=email,
                 course=course
             )
@@ -122,10 +121,10 @@ def teacher_register(request):
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
 
-            # Create new teacher
+            # Create new teacher with hashed password
             teacher = TeacherLogin.objects.create(
                 name=username,
-                password=password
+                password=make_password(password)  # Hash the password!
             )
             teacher.save()
 
@@ -203,76 +202,12 @@ def Taketest(request, fileName):
         return redirect('login')  # Redirect to login if session is invalid
     student = get_object_or_404(Login, name=username)
 
-    # ✅ Check if the test time window is valid
-    current_time = now()
-    if not (test.startTime <= current_time <= test.endTime):
-        # If time exceeded, process the answers and store results
-        test_record, created = StudentTestRecord.objects.get_or_create(student=student, test=test)
-        
-        if not test_record.status:  # Only process if the test is not already submitted
-            queFilePath = test.Qfiles.path
-            ansFilePath = test.Afiles.path
-
-            # ✅ Read question file
-            try:
-                with open(queFilePath, 'r') as f:
-                    lines = [line.strip() for line in f.readlines() if line.strip()]
-            except Exception as e:
-                print(f"Error reading question file: {e}")
-                return render(request, 'test.html', {'error': 'Could not load questions'})
-
-            # ✅ Read answer file
-            try:
-                with open(ansFilePath, 'r') as f:
-                    correct_answers = [line.strip() for line in f.readlines() if line.strip()]
-            except Exception as e:
-                print(f"Error reading answer file: {e}")
-                return render(request, 'test.html', {'error': 'Could not load answers'})
-
-            # ✅ Parse questions and options
-            questions = []
-            i = 0
-            while i < len(lines):
-                if i + 4 >= len(lines):
-                    break
-                question_text = lines[i]  # Question
-                options = lines[i+1:i+5]  # Next 4 lines are options
-                i += 5  # Move to next question
-
-                if len(options) == 4:
-                    questions.append({'question': question_text, 'options': options})
-
-            # ✅ If time is exceeded, mark unanswered questions
-            user_answers = test_record.user_answers if test_record.user_answers else []
-            if len(user_answers) < len(questions):
-                user_answers.extend(["Not Answered"] * (len(questions) - len(user_answers)))
-
-            correct = [i for i in range(len(user_answers)) if i < len(correct_answers) and user_answers[i] == correct_answers[i]]
-            incorrect = [i for i in range(len(user_answers)) if i not in correct]
-
-            # ✅ Save results in StudentTestRecord
-            test_record.user_answers = user_answers
-            test_record.correct_answers = [correct_answers[i] for i in correct]
-            test_record.incorrect_answers = incorrect
-            test_record.score = len(correct)
-            test_record.status = True  # Mark as completed
-            test_record.save()
-
-            # ✅ Save score in Scores model
-            Scores.objects.create(
-                student=student,
-                test=test,
-                courseCode=student.name[2:4],
-                marks=len(correct)
-            )
-
-        return redirect('review_test', test_id=test.id)
-
     # ✅ Check if the student has already taken the test
     test_record, created = StudentTestRecord.objects.get_or_create(student=student, test=test)
     if test_record.status:
         return redirect('review_test', test_id=test.id)
 
+    # ✅ Parse questions FIRST (needed for both GET and POST)
     queFilePath = test.Qfiles.path
     ansFilePath = test.Afiles.path
 
@@ -305,12 +240,22 @@ def Taketest(request, fileName):
         if len(options) == 4:
             questions.append({'question': question_text, 'options': options})
 
-    # ✅ Handle form submission
+    # ✅ Handle form submission FIRST (before checking time)
     if request.method == "POST":
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error("POST DATA: " + str(request.POST))
+        print("=" * 50)
+        print("POST DATA:", dict(request.POST))
+        print("=" * 50)
+        
         user_answers = [request.POST.get(f"q{i}", "Not Answered") for i in range(len(questions))]
-
-        correct = [i for i in range(len(user_answers)) if i < len(correct_answers) and user_answers[i] == correct_answers[i]]
-        incorrect = [i for i in range(len(user_answers)) if i not in correct]
+        
+        print("User answers:", user_answers)
+        print("Questions count:", len(questions))
+        
+        correct = [idx for idx in range(len(user_answers)) if idx < len(correct_answers) and user_answers[idx] == correct_answers[idx]]
+        incorrect = [idx for idx in range(len(user_answers)) if idx not in correct]
 
         # ✅ Save results in StudentTestRecord
         test_record.user_answers = user_answers
@@ -330,7 +275,20 @@ def Taketest(request, fileName):
 
         return redirect('review_test', test_id=test.id)
 
-    return render(request, 'test.html', {'test': test, 'questions': questions, 'fileName': test.Qfiles.name.split('/')[-1]})
+    # ✅ Check if the test time window is valid (only for GET requests)
+    current_time = now()
+    if not (test.startTime <= current_time <= test.endTime):
+        # Time exceeded - redirect to review
+        return redirect('review_test', test_id=test.id)
+
+    # Convert endTime to a JavaScript-friendly format (ISO string with timezone)
+    test_endtime_iso = test.endTime.isoformat()
+    return render(request, 'test.html', {
+        'test': test, 
+        'questions': questions, 
+        'fileName': test.Qfiles.name.split('/')[-1],
+        'test_endtime_iso': test_endtime_iso
+    })
 
 
 

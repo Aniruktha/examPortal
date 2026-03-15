@@ -1,0 +1,5 @@
+Copies a repository to your local machine
+A saved checkpoint of your work
+git status
+git commit
+git push

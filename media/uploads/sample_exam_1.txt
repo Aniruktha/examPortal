@@ -1,0 +1,25 @@
+What does git clone do?
+Deletes a repository
+Copies a repository to your local machine
+Uploads code to GitHub
+Renames a branch
+What is a commit in Git?
+A database table
+A saved checkpoint of your work
+A password
+A browser cookie
+Which command is used to see changed files in Git?
+git push
+git clone
+git status
+git merge
+Which command creates a checkpoint in Git?
+git add
+git commit
+git branch
+git pull
+Which command uploads local commits to GitHub?
+git push
+git status
+git log
+git init

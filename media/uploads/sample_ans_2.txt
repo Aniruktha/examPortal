@@ -1,0 +1,5 @@
+Latest committed and pushed version
+Stages changed files for commit
+git log --oneline
+Page not found
+Double quote

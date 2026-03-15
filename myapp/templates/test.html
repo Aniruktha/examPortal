@@ -24,13 +24,16 @@
 
         <div class="content">
             {% if questions %}
-            <form id="testForm" method="post" action="{% url 'Taketest' fileName|cut:'uploads/' %}">
+            <form id="testForm" method="post" action="/test/{{ fileName }}/">
                 {% csrf_token %}
                 {% for question in questions %}
-                    <div id="question{{ forloop.counter }}" class="question" data-question-number="{{ forloop.counter }}">
-                        <p><strong>{{ question.question }}</strong></p>
+                    <div id="question{{ forloop.counter }}" class="question" data-question-number="{{ forloop.counter0 }}">
+                        <p><strong>Q{{ forloop.counter }}: {{ question.question }}</strong></p>
                         {% for option in question.options %}
-                            <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ option }}"> {{ option }}<br>
+                            <label>
+                                <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ option }}"> 
+                                {{ option }}
+                            </label><br>
                         {% endfor %}
                     </div>
                     <button type="button" onclick="markDoubt('question{{ forloop.counter }}')">Mark as Doubt</button><br>
@@ -45,52 +48,64 @@
 </body>
 
 <script>
-    let testEndTime = new Date("{{ test.endTime|date:'c' }}").getTime();
+    // Get the end time from the server - use ISO format
+    var testEndTime = new Date("{{ test_endtime_iso }}").getTime();
+    var questionCount = {{ questions|length }};
 
-function updateTimer() {
-    let now = new Date().getTime();
-    let timeLeft = testEndTime - now;
+    function updateTimer() {
+        var now = new Date().getTime();
+        var timeLeft = testEndTime - now;
 
-    if (timeLeft <= 0) {
-        document.getElementById("timer").innerHTML = "Time's up!";
-        //autoSubmit();
-        return;
+        if (timeLeft <= 0) {
+            document.getElementById("timer").innerHTML = "Time's up!";
+            autoSubmit();
+            return;
+        }
+
+        var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        document.getElementById("timer").innerHTML = minutes + "m " + seconds + "s ";
+        setTimeout(updateTimer, 1000);
     }
 
-    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-    document.getElementById("timer").innerHTML = minutes + "m " + seconds + "s ";
-    setTimeout(updateTimer, 1000);
-}
-
-/*function autoSubmit() {
-    let form = document.getElementById("testForm");
-    
-    // Fill in unanswered questions as "Not Answered"
-    document.querySelectorAll("input[type='radio']").forEach(radio => {
-        if (!radio.checked) {
-            let name = radio.name;
-            if (!document.querySelector(`input[name="${name}"]:checked`)) {
-                let hiddenInput = document.createElement("input");
+    function autoSubmit() {
+        var form = document.getElementById("testForm");
+        
+        // Debug: Log all radio button values
+        console.log("Auto-submitting form...");
+        for (var i = 0; i < questionCount; i++) {
+            var checked = document.querySelector('input[name="q' + i + '"]:checked');
+            console.log("Q" + i + ":", checked ? checked.value : "Not Answered");
+            if (!checked) {
+                var hiddenInput = document.createElement("input");
                 hiddenInput.type = "hidden";
-                hiddenInput.name = name;
-                hiddenInput.value = "Not Answered";  // Store unanswered as "Not Answered"
+                hiddenInput.name = "q" + i;
+                hiddenInput.value = "Not Answered";
                 form.appendChild(hiddenInput);
             }
         }
+
+        form.submit();
+    }
+
+    // Add form submit handler for debugging
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+        console.log("Form submitted!");
+        for (var i = 0; i < questionCount; i++) {
+            var checked = document.querySelector('input[name="q' + i + '"]:checked');
+            console.log("Question " + i + ":", checked ? checked.value : "NOT SELECTED");
+        }
     });
 
-    form.submit();
-}*/
-    window.onload = updateTimer; 
+    window.onload = updateTimer;
 
     function markDoubt(questionId) {
         document.getElementById(questionId).classList.toggle('doubt');
     }
 
     function scrollToQuestion(questionId) {
-        const questionElement = document.getElementById(questionId);
+        var questionElement = document.getElementById(questionId);
         if (questionElement) {
             window.scrollTo({
                 top: questionElement.offsetTop - 10,
@@ -98,6 +113,5 @@ function updateTimer() {
             });
         }
     }
-    
 </script>
 </html>
