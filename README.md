@@ -21,7 +21,7 @@ This application provides separate authentication flows for students and teacher
 
 ```bash
 # Install dependencies
-pip install django mysqlclient
+pip install django pymysql
 
 # Configure database in moodle/settings.py
 

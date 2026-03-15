@@ -75,17 +75,29 @@ WSGI_APPLICATION = 'moodle.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+import os
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'webdevelopment',
-        'USER': 'root',
-        'PASSWORD': 'Aniruktha@123',
-        'HOST': 'localhost',
-        'PORT': '3306'
+# Check for external database (Vercel/Railway)
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # Production: Use external database (Vercel/Railway)
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(database_url)
     }
-}
+else:
+    # Local development: Use local MySQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'webdevelopment',
+            'USER': 'root',
+            'PASSWORD': 'Aniruktha@123',
+            'HOST': 'localhost',
+            'PORT': '3306'
+        }
+    }
 
 
 # Password validation
