@@ -40,7 +40,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://astonishing-learning-production-3310.up.railway.app",
     "https://examportal-production-be3c.up.railway.app/",
-    "https://nurturing-enjoyment-production-8d67.up.railway.app/",
+    "https://examportal-moodlev2.up.railway.app/",
 ]
 # Application definition
 
