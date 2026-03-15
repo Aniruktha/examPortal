@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse, redirect, get_object_or_404
 from .models import Login,Testfiles, Scores, Login, Courses,ClassCourses, StudentTestRecord, TeacherLogin
-from .forms import FileUploadForm, Loginform
+from .forms import FileUploadForm, Loginform, StudentRegistrationForm, TeacherRegistrationForm, StudentLoginForm, TeacherLoginForm
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
@@ -27,37 +27,116 @@ def get_courses(username):
 
 
 def login_details(request):
+    """Original login view - redirects to role-specific login"""
+    return redirect('student_login')
+
+
+def student_login(request):
+    """Student Login View - Separate from Teacher Login"""
     if request.method == "POST":
-        form = Loginform(request.POST)
+        form = StudentLoginForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data["username"]
+            username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
 
-            user = Login.objects.filter(name=name, password=password).first()
-            if not(user):
-                user=TeacherLogin.objects.filter(name=name, password=password).first()
+            user = Login.objects.filter(name=username, password=password).first()
 
             if user:
                 request.session['username'] = user.name  
                 course = get_courses(user.name)
                 request.session['course'] = course  
-
-                # Check if the user exists in Student or Teacher tables
-                if Login.objects.filter(name=user.name).exists():
-                    return redirect("home")  # Redirect students to home.html
-                elif TeacherLogin.objects.filter(name=user.name).exists():
-                    return redirect("upload_file")  # Redirect teachers to FileUpload.html
-                
-                # If user isn't found in either table, handle it
-                return render(request, "base.html", {"form": form, "error": "User type unknown"})
-                
+                return redirect("home")
             else:
-                return render(request, "base.html", {"form": form, "error": "Invalid credentials"})
-
+                return render(request, "student_login.html", {"form": form, "error": "Invalid credentials"})
     else:
-        form = Loginform()
+        form = StudentLoginForm()
 
-    return render(request, "base.html", {"form": form})
+    return render(request, "student_login.html", {"form": form})
+
+
+def teacher_login(request):
+    """Teacher Login View - Separate from Student Login"""
+    if request.method == "POST":
+        form = TeacherLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+
+            user = TeacherLogin.objects.filter(name=username, password=password).first()
+
+            if user:
+                request.session['username'] = user.name  
+                request.session['course'] = 'Teacher'  
+                return redirect("upload_file")
+            else:
+                return render(request, "teacher_login.html", {"form": form, "error": "Invalid credentials"})
+    else:
+        form = TeacherLoginForm()
+
+    return render(request, "teacher_login.html", {"form": form})
+
+
+def student_register(request):
+    """Student Registration View - Sign up for new students"""
+    if request.method == "POST":
+        form = StudentRegistrationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+
+            # Extract course from username (format: 23pw001)
+            course_key = username[2:4]
+            course_map = {
+                'pw': "Software Systems",
+                'pc': "Cyber Security",
+                'pt': "Theoritical Computer Science",
+                'pd': "Data Science"
+            }
+            course = course_map.get(course_key, "Unknown Course")
+
+            # Create new student
+            student = Login.objects.create(
+                name=username,
+                password=password,
+                mail=email,
+                course=course
+            )
+            student.save()
+
+            return render(request, "student_register.html", {
+                "form": StudentRegistrationForm(),
+                "success": "Registration successful! Please login."
+            })
+    else:
+        form = StudentRegistrationForm()
+
+    return render(request, "student_register.html", {"form": form})
+
+
+def teacher_register(request):
+    """Teacher Registration View - Sign up for new teachers"""
+    if request.method == "POST":
+        form = TeacherRegistrationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+
+            # Create new teacher
+            teacher = TeacherLogin.objects.create(
+                name=username,
+                password=password
+            )
+            teacher.save()
+
+            return render(request, "teacher_register.html", {
+                "form": TeacherRegistrationForm(),
+                "success": "Registration successful! Please login."
+            })
+    else:
+        form = TeacherRegistrationForm()
+
+    return render(request, "teacher_register.html", {"form": form})
 
 
 def profile_view(request):

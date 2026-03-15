@@ -5,7 +5,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path("", views.login_details, name="Login"),
+    # Login and Registration URLs
+    path("", views.student_login, name="student_login"),
+    path("teacher/login/", views.teacher_login, name="teacher_login"),
+    path("student/register/", views.student_register, name="student_register"),
+    path("teacher/register/", views.teacher_register, name="teacher_register"),
+    
+    # Original login view (redirects)
+    path("login/", views.login_details, name="Login"),
+    
+    # Main App URLs
     path('home/', home, name='home'),
     path("aboutus/", views.about_us, name="aboutus"),
     path("profile/", profile_view, name="profile"),
