@@ -29,7 +29,15 @@ SECRET_KEY = 'django-insecure-gc+z@p90umwalz_1j(p+09n(94$x^!-r9%66met6b=v3*fflp1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "astonishing-learning-production-3310.up.railway.app",
+    "127.0.0.1",
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://astonishing-learning-production-3310.up.railway.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
